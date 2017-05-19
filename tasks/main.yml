@@ -1,0 +1,36 @@
+---
+
+- name: Dotfiles | Ensure dotfiles repo is present locally
+  git: "{{ dotfiles_repo }}"
+    dest: "{{ dotfiles_repo_dir }}"
+    accept_key: "{{ dotfiles_repo_accept_hostkey }}"
+  become: no
+  tags: dotfiles
+
+- name: Dotfiles | Ensure all dotfiles are links.
+  shell: "ls -F {{ dotfiles_home }}/{{ item}}"
+  register: dotfile_info
+  failed_when: false
+  check_mode: no
+  changed_when: false
+  with_items: "{{ dotfiles }}"
+  become: no
+  tags: dotfiles
+
+- name: Dotfiles | Cleanup existing dotfiles before replaced
+  file:
+    path: "{{ dotfiles_home }}/{{ dotfiles[item.0] }}"
+    state: absent
+  when: "'@' not in item.1.stdout"
+  become: no
+  with_index_items: "{{ dotfile_info.results }}"
+  tags: dotfiles
+
+- name: Dotfiles | Link dotfiles into "{{ dotfiles_home }}"
+  file:
+    src: "{{ dotfiles_repo_dir }}/{{ item }}"
+    dest: "{{ dotfiles_home }}{{ item }}"
+    state: link
+  become: no
+  with_items: "{{ dotfiles }}"
+  tags: dotfiles

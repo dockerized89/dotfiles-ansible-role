@@ -1,0 +1,11 @@
+---
+
+dotfiles_repo: https://github.com/dockerized89/dotfiles.git
+dotfiles_repo_accept_hostkey: no
+dotfiles_repo_dir: "~/.dotfiles
+dotfiles_home: '~'
+
+dotfiles_files:
+  - .bash_profile
+  - .gitconfig
+  - .vimrc
